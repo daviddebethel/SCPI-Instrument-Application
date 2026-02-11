@@ -1,16 +1,20 @@
 # User Guide
 
 ## Purpose
-Run the MP730889 SCPI desktop app, connect to the meter, read values, and optionally log data.
+Run the SCPI desktop app, connect to a supported instrument, read values, and optionally log data.
+
+## Supported instruments
+- Multicomp Pro MP730889 DMM
+- OWON SPE6103 PSU
 
 ## Prerequisites
 - macOS with Homebrew available.
-- Meter connected over serial (native serial or USB-serial adapter).
-- Project checked out at `~/Code/Git/DMM` (or your local equivalent).
+- Instrument connected over serial (native serial or USB-serial adapter).
+- Project checked out at `/Users/david/Code/Git/SCPI Lab Instrument App` (or your local equivalent).
 
 ## 1. Create and activate environment
 ```bash
-cd /Users/david/Code/Git/DMM
+cd "/Users/david/Code/Git/SCPI Lab Instrument App"
 brew install python@3.12
 /opt/homebrew/bin/python3.12 -m venv .venv
 source .venv/bin/activate
@@ -39,13 +43,15 @@ python -m dmm_app.main
 8. Optional: click `Remove` on any extra row to remove it.
    - Guard: duplicate functions across rows are blocked (rows must be unique).
 9. Set interval in ms.
-10. Click `Start` to poll all rows. The app queries each row back-to-back per interval to keep timestamps close.
+10. Click `Start` to poll all rows.
+   - The app queries each row back-to-back per interval to keep timestamps close.
 11. Optional: check `Enable logging`, choose CSV file path.
 12. Click `Snapshot` for a one-off reading across all rows without continuous polling.
-13. Click `Stop` to end polling, `Disconnect` when done.
+13. Click `Stop` to end polling, then `Disconnect` when done.
 
 ## Logging output
 - CSV fields: `timestamp,measurement_slot,device_name,device_idn,function,value,unit,raw_response`
+- `measurement_slot` is 1-based and maps to the row number in the Measurement area.
 - A header row is written for new files.
 
 ## Troubleshooting

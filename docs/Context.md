@@ -1,17 +1,20 @@
 # Context
 
 ## Project one liner
-Desktop SCPI control application for lab engineers to communicate with a Multicomp Pro DMM (MP730889 target) and acquire measurements over instrument I/O.
+Desktop SCPI control application for lab engineers to communicate with supported lab instruments (MP730889 DMM and OWON SPE6103 PSU) and acquire measurements over instrument I/O.
 
 ## Current objective
 Deliver an MVP GUI that connects over serial, lets the user select the target instrument profile (Multicomp MP730889 or Owon SPE6103), supports one or multiple measurement rows per device capability, polls readings at a configurable interval, displays readings live, and optionally logs data to CSV.
+
+## Workspace path
+- `/Users/david/Code/Git/SCPI Lab Instrument App`
 
 ## Repo map
 - `dmm_app/`: application source code.
 - `dmm_app/models.py`: domain models (serial settings, measurement function, reading).
 - `dmm_app/transport.py`: transport abstraction and serial transport implementation.
 - `dmm_app/scpi.py`: SCPI client wrapper for command/query.
-- `dmm_app/commands.py`: measurement command catalog.
+- `dmm_app/commands.py`: instrument profiles and measurement command catalog.
 - `dmm_app/poller.py`: background polling worker.
 - `dmm_app/logging_util.py`: CSV logging helper.
 - `dmm_app/gui.py`: PySide6 (Qt) GUI and orchestration.
@@ -26,9 +29,9 @@ Deliver an MVP GUI that connects over serial, lets the user select the target in
 - 2026-02-11: Added instrument-profile selection to support SCPI command nuances between MP730889 DMM and Owon SPE6103 PSU.
 - 2026-02-11: Added connection-time IDN validation so selected instrument must match the connected device identity string.
 - 2026-02-11: Added multi-row measurement scheduling for Owon so voltage and current can be queried in the same interval cycle.
-- 2026-02-11: Chose modular architecture (transport/client/poller/commands/gui) to support future expansion to all DMM functions.
+- 2026-02-11: Added duplicate-function guards for multi-row measurements.
+- 2026-02-11: Chose modular architecture (transport/client/poller/commands/gui) to support future expansion to all supported instrument functions.
 - 2026-02-11: Chose CSV as the initial log format for interoperability with lab workflows.
-- 2026-02-11: Chose runtime SCPI identity verification (`*IDN?`) before relying on model-specific behavior.
 
 ## Constraints
 - OS: macOS development environment; target desktop OS may include Windows/macOS/Linux.
@@ -47,11 +50,12 @@ Deliver an MVP GUI that connects over serial, lets the user select the target in
   - Command strings terminated with newline.
   - Query returns ASCII text line.
 - Data logging contract:
-  - CSV columns: `timestamp,function,value,unit,raw_response`.
+  - CSV columns: `timestamp,measurement_slot,device_name,device_idn,function,value,unit,raw_response`.
 - GUI interaction contract:
   - User selects instrument profile prior to connection.
   - User selects port/baud prior to connection.
   - Logging enable triggers file selection flow.
+  - OWON supports multiple measurement rows; MP is single-row only.
 
 ## Open questions / risks
 - Manual reviewed was for MP730424; MP730889 command parity and transport behavior need hardware validation.
